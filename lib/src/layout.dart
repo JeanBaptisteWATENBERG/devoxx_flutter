@@ -7,6 +7,12 @@ class Layout extends StatelessWidget {
 
   Layout();
 
+  Layout setPage({title, body}) {
+    this.title = title;
+    this.body = body;
+    return this;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
