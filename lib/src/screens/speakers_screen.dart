@@ -4,12 +4,12 @@ import 'package:devoxx_flutter/src/utils/network_exception.dart';
 import 'package:devoxx_flutter/src/widgets/speaker_list_item.dart';
 import 'package:flutter/material.dart';
 
-class SpeakersPage extends StatefulWidget {
+class SpeakersScreen extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => new _SpeakersPage();
+  State<StatefulWidget> createState() => new _SpeakersScreen();
 }
 
-class _SpeakersPage extends State<SpeakersPage> {
+class _SpeakersScreen extends State<SpeakersScreen> {
   List _speakers;
   bool _loading = true;
 
@@ -22,15 +22,15 @@ class _SpeakersPage extends State<SpeakersPage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return _surroundWithScaffold(new Center(
+      return new Center(
         child: new CircularProgressIndicator(
           value: null,
           valueColor: new AlwaysStoppedAnimation<Color>(Colors.grey[300]),
         ),
-      ));
+      );
     }
 
-    return _surroundWithScaffold(new ListView(
+    return new ListView(
       children: _speakers.map((speaker) {
         return new SpeakerListItem(
           speaker: speaker,
@@ -42,13 +42,6 @@ class _SpeakersPage extends State<SpeakersPage> {
             ));
           });
       }).toList(),
-    ));
-  }
-
-  _surroundWithScaffold(body) {
-    return new Scaffold(
-      appBar: new AppBar(title: new Text('Devoxx FR - Speakers')),
-      body: body,
     );
   }
 
@@ -63,6 +56,7 @@ class _SpeakersPage extends State<SpeakersPage> {
         _loading = false;
       });
     } on NetworkException catch (exception) {
+      print(exception);
       setState(() {
         _loading = false;
       });
