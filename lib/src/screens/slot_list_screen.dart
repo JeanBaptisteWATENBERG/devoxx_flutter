@@ -1,31 +1,20 @@
 import 'dart:async';
 
+import 'package:devoxx_flutter/src/state_provider.dart';
 import 'package:devoxx_flutter/src/models/e_day.dart';
 import 'package:devoxx_flutter/src/screens/talk_card_screen.dart';
 import 'package:devoxx_flutter/src/services/conferences_api.dart';
 import 'package:devoxx_flutter/src/services/starred_api.dart';
-import 'package:devoxx_flutter/src/utils/network_exception.dart';
 import 'package:devoxx_flutter/src/widgets/slot_list_item.dart';
 import 'package:flutter/material.dart';
 
-class SlotListScreen extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => new _SlotListScreen();
-}
-
-class _SlotListScreen extends State<SlotListScreen> {
-  List _slots;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTalks();
-  }
+class SlotListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+    _loadState(context);
+    var appState = StateProvider.of(context);
+    if (appState.areSlotsLoading) {
       return new Center(
         child: new CircularProgressIndicator(
           value: null,
@@ -35,16 +24,15 @@ class _SlotListScreen extends State<SlotListScreen> {
     }
 
     return new ListView(
-      children: _slots.map((slot) {
+      children: appState.slots.map((slot) {
+        var talkCardScreen = new TalkCardScreen(slot: slot);
         return new SlotListItem(
             slot: slot,
             onSelect: (Map s) {
               if (s != null && s.containsKey('talk') && s['talk'] != null) {
                 Navigator.of(context).push(new MaterialPageRoute<Null>(
                   builder: (BuildContext context) {
-                    return new TalkCardScreen(slot: s, onStarredChanged: (isStarred) {
-                      _loadTalks();
-                    });
+                    return talkCardScreen;
                   },
                 ));
               }
@@ -53,7 +41,7 @@ class _SlotListScreen extends State<SlotListScreen> {
     );
   }
 
-  _loadTalks() async {
+  _loadState(context) async {
     try {
       ConferencesApi api = new ConferencesApi.fromConfig();
 
@@ -76,14 +64,12 @@ class _SlotListScreen extends State<SlotListScreen> {
         slots.addAll(daySlotsObject['slots'].map((slot) { return _starredTalks(starredTalks, slot); }).toList());
       });
 
-      setState(() {
-        _slots = slots;
-        _loading = false;
-      });
-    } on NetworkException catch (exception) {
-      setState(() {
-        _loading = false;
-      });
+      var appState = StateProvider.of(context);
+      appState.slots = slots;
+      appState.areSlotsLoading = false;
+    } catch (exception) {
+      var appState = StateProvider.of(context);
+      appState.areSlotsLoading = false;
       Scaffold.of(context).showSnackBar(new SnackBar(content: new Text('An error occured, please try again later')));
     }
   }
