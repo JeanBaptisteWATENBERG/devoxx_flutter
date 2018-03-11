@@ -1,3 +1,4 @@
+import 'package:devoxx_flutter/src/models/devoxx_flutter_state.dart';
 import 'package:devoxx_flutter/src/services/starred_api.dart';
 import 'package:devoxx_flutter/src/state_provider.dart';
 import 'package:devoxx_flutter/src/widgets/talk_speakers.dart';
@@ -5,29 +6,53 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:meta/meta.dart';
 
-class TalkCardScreen extends StatelessWidget {
+class TalkCardScreen extends StatefulWidget {
   final Map slot;
 
   TalkCardScreen({Key key, @required this.slot}) : super(key: key);
 
-  toggleStar(appState, talk) {
+  @override
+  State<StatefulWidget> createState() => new _TalkCardScreen();
+}
+
+class _TalkCardScreen extends State<TalkCardScreen> {
+  bool _isStarred;
+
+
+  @override
+  void initState() {
+    super.initState();
+    _isStarred = widget.slot['talk']['isStarred'];
+  }
+
+  toggleStar(DevoxxFlutterState appState, talk) {
     var starredApi = new StarredApi();
-    appState.currentSlot = slot;
-    if (talk['isStarred']) {
+    if (_isStarred) {
       starredApi.unStarATalk(talk['id']);
-      appState.updateTalkStar(false);
+      appState.updateTalkStar(talk['id'], false);
+      if (mounted) {
+        setState(() {
+          _isStarred = false;
+        });
+      }
     } else {
       starredApi.starATalk(talk['id']);
-      appState.updateTalkStar(true);
+      appState.updateTalkStar(talk['id'], true);
+      if (mounted) {
+        setState(() {
+          _isStarred = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var appState = StateProvider.of(context);
+    var slot = widget.slot;
     var talk = slot['talk'];
     return new Scaffold(
-        floatingActionButton: talk['isStarred'] ?
+        floatingActionButton: _isStarred ?
         new FloatingActionButton(
             child: new Icon(Icons.favorite),
             backgroundColor: Colors.red,
@@ -76,4 +101,5 @@ class TalkCardScreen extends StatelessWidget {
                   )))
         ]));
   }
+
 }

@@ -18,31 +18,19 @@ class DevoxxFlutterState extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map _currentSlot;
-
-  Map get currentSlot => _currentSlot;
-
-  void set currentSlot(Map currentSlot) {
-    _currentSlot = currentSlot;
-    print(_currentSlot['talk']['isStarred']);
-    notifyListeners();
-  }
-
   DevoxxFlutterState(this._areSlotsLoading);
 
-  void updateTalkStar(isStarred) {
-    if (currentSlot != null) {
-      currentSlot['talk']['isStarred'] = isStarred;
-    }
-    if (slots != null && currentSlot != null) {
+  void updateTalkStar(talkId, isStarred) {
+    if (slots != null) {
       slots = slots.map((slot) {
         if (slot.containsKey('talk') && slot['talk'] != null) {
-          if (slot['talk']['id'] == currentSlot['talk']['id']) {
+          if (slot['talk']['id'] == talkId) {
             slot['talk']['isStarred'] = isStarred;
           }
         }
         return slot;
       }).toList();
+      notifyListeners();
     }
   }
 

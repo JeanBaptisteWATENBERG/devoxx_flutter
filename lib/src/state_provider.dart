@@ -18,8 +18,6 @@ class StateProvider extends StatefulWidget {
   State<StatefulWidget> createState() => new _ProviderState();
 }
 
-
-
 class _ProviderState extends State<StateProvider> {
   @override
   initState() {
@@ -48,19 +46,20 @@ class _InheritedProvider extends InheritedWidget {
   _InheritedProvider({DevoxxFlutterState this.data, this.child})
       : _dataSlots = data.slots,
         _dataAreSlotsLoading = data.areSlotsLoading,
-        _dataCurrentSlot = data.currentSlot,
         super(child: child);
+
   final data;
   final child;
   final List _dataSlots;
   final bool _dataAreSlotsLoading;
-  final Map _dataCurrentSlot;
 
   @override
   bool updateShouldNotify(_InheritedProvider oldWidget) {
     Function eq = const DeepCollectionEquality().equals;
-    return !eq(_dataSlots, oldWidget._dataSlots) ||
-        _dataAreSlotsLoading != oldWidget._dataAreSlotsLoading ||
-        !eq(_dataCurrentSlot, oldWidget._dataCurrentSlot);
+
+    final shouldNotify = !eq(_dataSlots, oldWidget._dataSlots) ||
+        _dataAreSlotsLoading != oldWidget._dataAreSlotsLoading;
+
+    return shouldNotify;
   }
 }

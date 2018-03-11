@@ -25,14 +25,13 @@ class SlotListScreen extends StatelessWidget {
 
     return new ListView(
       children: appState.slots.map((slot) {
-        var talkCardScreen = new TalkCardScreen(slot: slot);
         return new SlotListItem(
             slot: slot,
             onSelect: (Map s) {
               if (s != null && s.containsKey('talk') && s['talk'] != null) {
                 Navigator.of(context).push(new MaterialPageRoute<Null>(
                   builder: (BuildContext context) {
-                    return talkCardScreen;
+                    return new TalkCardScreen(slot: s);
                   },
                 ));
               }
