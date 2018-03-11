@@ -17,7 +17,6 @@ class TalkSpeakers extends StatefulWidget {
 class _TalkSpeakers extends State<TalkSpeakers> {
   List _speakers;
   bool _loading = true;
-  bool _error = false;
 
   @override
   void initState() {
@@ -33,7 +32,6 @@ class _TalkSpeakers extends State<TalkSpeakers> {
     return new Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: _speakers.map((speaker) {
-          print(speaker['avatarURL']);
           return new Expanded(
               child: new Container(
                   margin: new EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
@@ -62,6 +60,7 @@ class _TalkSpeakers extends State<TalkSpeakers> {
         _loading = false;
       });
     } on NetworkException catch (exception) {
+      print(exception);
       setState(() {
         _loading = false;
       });

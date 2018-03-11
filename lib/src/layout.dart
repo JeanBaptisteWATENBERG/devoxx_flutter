@@ -1,12 +1,22 @@
-import 'package:devoxx_flutter/src/screens/slot_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 class Layout extends StatelessWidget {
+  String title;
+  Widget body;
+
+  Layout();
+
+  Layout setPage({title, body}) {
+    this.title = title;
+    this.body = body;
+    return this;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text('Devoxx FR - Schedule')),
+      appBar: new AppBar(title: new Text(title)),
       drawer: new Drawer(
           child: new ListView(children: <Widget>[
             new DrawerHeader(
@@ -36,7 +46,7 @@ class Layout extends StatelessWidget {
             )
           ])
       ),
-      body: new SlotListScreen(),
+      body: body,
     );
   }
 

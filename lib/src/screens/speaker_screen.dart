@@ -1,5 +1,7 @@
+import 'package:devoxx_flutter/src/screens/talk_card_screen.dart';
 import 'package:devoxx_flutter/src/services/conferences_api.dart';
-import 'package:devoxx_flutter/src/services/starred_api.dart';
+import 'package:devoxx_flutter/src/state_provider.dart';
+import 'package:devoxx_flutter/src/widgets/slot_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -21,15 +23,11 @@ class _SpeakerScreen extends State<SpeakerScreen> {
   Map _fullSpeaker;
   bool _isLoading = true;
 
-
-  @override
-  void initState() {
-    super.initState();
-    _loadFullSpeaker();
-  }
-
   @override
   Widget build(BuildContext context) {
+    var appState = StateProvider.of(context);
+    var slots = appState.slots;
+    _loadFullSpeaker(slots);
     return new DefaultTabController(
         length: tabs.length,
         child: new Scaffold(
@@ -60,9 +58,20 @@ class _SpeakerScreen extends State<SpeakerScreen> {
                   return new Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: new ListView(children: _fullSpeaker['acceptedTalks'].map((Map talk) {
-                      return new ListTile(
-                        leading: new Icon(talk['isStarred'] ? Icons.favorite : Icons.slideshow),
-                        title: new Text(talk['title']),
+                      var slot = slots
+                        .firstWhere((slot) =>
+                          slot.containsKey('talk') &&
+                              slot['talk'] != null &&
+                              slot['talk']['id'] == talk['id']);
+                      return new SlotListItem(
+                        slot: slot,
+                        onSelect: (Map s) {
+                          Navigator.of(context).push(new MaterialPageRoute<Null>(
+                            builder: (BuildContext context) {
+                              return new TalkCardScreen(slot: s);
+                            },
+                          ));
+                        },
                       );
                     }).toList())
                   );
@@ -73,30 +82,24 @@ class _SpeakerScreen extends State<SpeakerScreen> {
     );
   }
 
-  void _loadFullSpeaker() async {
+  void _loadFullSpeaker(List<Map> slots) async {
     try {
       ConferencesApi api = new ConferencesApi.fromConfig();
-      StarredApi starredApi = new StarredApi();
       var fullSpeaker = await api.fetchASpeaker(widget._speaker['uuid']);
-      var starredTalks = await starredApi.fetchAllStarredTalks();
-      fullSpeaker['acceptedTalks'] = fullSpeaker['acceptedTalks'].map((talk) {
-        if (starredTalks.contains(talk['id'])) {
-          talk['isStarred'] = true;
-        } else {
-          talk['isStarred'] = false;
-        }
-        return talk;
-      }).toList();
 
-      setState(() {
-        _isLoading = false;
-        _fullSpeaker = fullSpeaker;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _fullSpeaker = fullSpeaker;
+        });
+      }
     } catch(e) {
-      setState(() {
-        _isLoading = false;
-      });
-      Scaffold.of(context).showSnackBar(new SnackBar(content: new Text('An error occured while loading speaker profile, please try again later')));
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        Scaffold.of(context).showSnackBar(new SnackBar(content: new Text('An error occured while loading speaker profile, please try again later')));
+      }
     }
   }
 }
