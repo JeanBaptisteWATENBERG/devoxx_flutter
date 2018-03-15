@@ -26,7 +26,6 @@ class SlotListScreen extends StatefulWidget implements Searchable {
 class _SlotListScreen extends State<SlotListScreen> {
   @override
   Widget build(BuildContext context) {
-    print('Building home..');
     _loadState(context);
     var appState = StateProvider.of(context);
     if (appState.areSlotsLoading) {

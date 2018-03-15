@@ -41,7 +41,6 @@ class _SpeakersScreen extends State<SpeakersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('Building speakers..');
     if (_loading) {
       return new Center(
         child: new CircularProgressIndicator(
