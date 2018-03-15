@@ -18,7 +18,22 @@ class DevoxxFlutterState extends ChangeNotifier {
     notifyListeners();
   }
 
-  DevoxxFlutterState(this._areSlotsLoading);
+  String _title;
+
+  String get title => _title;
+
+  void set title(String title) {
+    _title = title;
+  }
+  Widget _body;
+
+  Widget get body => _body;
+
+  void set body(Widget body) {
+    _body = body;
+  }
+
+  DevoxxFlutterState(this._areSlotsLoading, this._title, this._body);
 
   void updateTalkStar(talkId, isStarred) {
     if (slots != null) {
@@ -30,6 +45,14 @@ class DevoxxFlutterState extends ChangeNotifier {
         }
         return slot;
       }).toList();
+      notifyListeners();
+    }
+  }
+
+  setPage({title, body}) {
+    if (title != this.title) {
+      this.title = title;
+      this.body = body;
       notifyListeners();
     }
   }

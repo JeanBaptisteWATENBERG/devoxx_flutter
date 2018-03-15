@@ -25,7 +25,11 @@ class _ProviderState extends State<StateProvider> {
     widget.data.addListener(didValueChange);
   }
 
-  didValueChange() => setState(() {});
+  didValueChange() {
+    if (mounted && !context.owner.debugBuilding) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,19 +50,22 @@ class _InheritedProvider extends InheritedWidget {
   _InheritedProvider({DevoxxFlutterState this.data, this.child})
       : _dataSlots = data.slots,
         _dataAreSlotsLoading = data.areSlotsLoading,
+        _dataTitle = data.title,
         super(child: child);
 
   final data;
   final child;
   final List _dataSlots;
   final bool _dataAreSlotsLoading;
+  final String _dataTitle;
 
   @override
   bool updateShouldNotify(_InheritedProvider oldWidget) {
     Function eq = const DeepCollectionEquality().equals;
 
     final shouldNotify = !eq(_dataSlots, oldWidget._dataSlots) ||
-        _dataAreSlotsLoading != oldWidget._dataAreSlotsLoading;
+        _dataAreSlotsLoading != oldWidget._dataAreSlotsLoading ||
+        _dataTitle != oldWidget._dataTitle;
 
     return shouldNotify;
   }

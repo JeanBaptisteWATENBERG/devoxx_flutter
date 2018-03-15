@@ -1,3 +1,4 @@
+import 'package:devoxx_flutter/src/utils/string_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
@@ -49,7 +50,7 @@ class SlotListItem extends StatelessWidget {
         isThreeLine: false,
         leading: icon,
         title: new Text(title),
-        subtitle: new Text('In ' + slot['roomName'] + ' from ' + slot['fromTime'] + ' to ' + slot['toTime']),
+        subtitle: new Text(capitalize(slot['day']) + ' in ' + slot['roomName'] + ' from ' + slot['fromTime'] + ' to ' + slot['toTime']),
       ),
     );
   }
